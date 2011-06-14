@@ -26,8 +26,8 @@ Except as specifically stated below, the 3rd party software packages are not dis
 this project, but instead are separately downloaded from the respective provider and built on the
 developer’s machine as a pre-build step.
 
-Downloaded javascript libraries should be placed under public_html/a folder in respectful directories,
-except prototype.js which should placed directly into public_html/a folder.
+Downloaded javascript libraries should be placed under htdocs/a folder in respectful directories,
+except prototype.js which should placed directly into htdocs/a folder.
 
 * prototype version 1.7 (MIT license)
 (Prototype is a JavaScript Framework that aims to ease development of dynamic web applications.)

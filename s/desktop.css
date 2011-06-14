@@ -1,0 +1,644 @@
+/* reset */
+*
+{
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    outline: 0px;
+    font-size: 1px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+/* common */
+html
+{
+    height: 100%;
+    font-family: "Droid Sans", "Helvetica", sans-serif;
+}
+body
+{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000000;
+/*     cursor: none !important; */
+}
+#dummy
+{
+    display: none;
+}
+@-webkit-keyframes screeny
+{
+    0%
+    {
+        opacity: 0.9;
+    }
+    100%
+    {
+        opacity: 0.7;
+    }
+}
+#screen
+{
+    -webkit-animation-iteration-count: none;
+    -webkit-transition: opacity 1s linear;
+
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: auto;
+    height: auto;
+    background-color: #000000;
+    opacity: 0;
+    z-index: 90;
+}
+    #screen.active
+    {
+        -webkit-animation-name: screeny;
+        -webkit-animation-duration: 1s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-direction: alternate;
+        -webkit-animation-delay: 1s;
+        opacity: 0.8;
+        z-index: 110;
+    }
+    #screen.paused
+    {
+        opacity: 0.4;
+        z-index: 110;
+    }
+    #screen.covered
+    {
+        opacity: 0.8;
+        z-index: 110;
+    }
+#screen>div
+{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    margin: auto;
+    height: 100px;
+    line-height: 100px;
+    font-size: 72px;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-shadow: 0px 0px 10px #ffffff;
+}
+input#player_signin
+{
+    position: absolute;
+    width: 200px;
+    height: 28px;
+    bottom: -50px;
+    left: 50%;
+    margin-left: -100px;
+    padding: 5px 10px;
+    font-size: 20px;
+    line-height: 28px;
+    text-align: center;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    user-select: auto;
+}
+#buzz_submit
+{
+    -webkit-transition-property: color 0.5s linear;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -150px;
+    margin-left: -150px;
+    width: 300px;
+    height: 300px;
+    font-size: 60px;
+    line-height: 300px;
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden;
+    -webkit-border-radius: 150px;
+    -moz-border-radius: 150px;
+    border-radius: 150px;
+    text-shadow: 0px 1px 0px #808080;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e0e0e0), to(#c0c0c0));
+    background: -moz-linear-gradient(-90deg, #e0e0e0, #c0c0c0);
+    z-index: 115;
+}
+    #buzz_submit.hidden
+    {
+        display: none;
+    }
+    @-webkit-keyframes flashing
+    {
+        0%
+        {
+            -webkit-box-shadow: 0px 0px 1px #fc9d9a;
+        }
+        100%
+        {
+            -webkit-box-shadow: 0px 0px 30px #ff0000;
+        }
+    }
+    #buzz_submit.enabled
+    {
+        -webkit-animation-name: flashing;
+        -webkit-animation-duration: 0.75s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-direction: alternate;
+        -webkit-animation-timing-function: linear;
+
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f08080), to(#f04040));
+        background: -moz-linear-gradient(-90deg, #f08080, #f04040);
+        -moz-box-shadow: 0px 0px 30px #fc9d9a;
+        cursor: pointer;
+    }
+    #buzz_submit.pressed
+    {
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e0e0e0), to(#c0c0c0));
+        background: -moz-linear-gradient(-90deg, #e0e0e0, #c0c0c0);
+    }
+    #buzz_submit.enabled.pressed
+    {
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f04040), to(#f08080));
+        background: -moz-linear-gradient(-90deg, #f04040, #f08080);
+        cursor: pointer;
+    }
+
+#main
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -485px;
+    margin-top: -344px;
+    width: 910px;
+    height: 688px;
+    background-color: #000000;
+    border: 1px solid #000000;
+}
+@-webkit-keyframes flashy
+{
+    0%
+    {
+        opacity: 0;
+    }
+    100%
+    {
+        opacity: 0.25;
+    }
+}
+#badge
+{
+    position: absolute;
+    top: 308px;
+    left: -270px;
+    width: 630px;
+    height: 60px;
+    padding: 0px;
+    color: #ffffff;
+    line-height: 60px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 0px 0px 5px #ffffff;
+    overflow: hidden;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+}
+#badge>.name,
+#badge>.score
+{
+    position: absolute;
+    display: block;
+    bottom: 0px;
+    width: inherit;
+    font-size: 54px;
+    opacity: 0.25;
+}
+    #badge>.name
+    {
+        left: 0px;
+    }
+    #badge>.score
+    {
+        right: 0px;
+        text-align: right;
+    }
+    #badge.active>.score
+    {
+        -webkit-animation-name: flashy;
+        -webkit-animation-duration: 1s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-direction: alternate;
+
+        opacity: 0.25;
+    }
+#board
+{
+    position: absolute;
+    top: 20px;
+    right: 0px;
+    width: 820px;
+    height: 618px;
+    padding: 10px;
+    background-color: #606060;
+    overflow: hidden;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 8px;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+    -moz-box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+    z-index: 100;
+}
+#board .category
+{
+    position: relative;
+    display: inline-block;
+    width: 130px;
+    height: 618px;
+    margin-right: 8px;
+}
+    #board .category:last-child
+    {
+        margin-right: 0px;
+    }
+#board .category .head,
+#board .category .question
+{
+    position: relative;
+    width: 130px;
+    height: 96px;
+    margin-bottom: 2px;
+    background-color: #5f00cf;
+    color: #ffffff;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 8px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+    -moz-box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+    box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+}
+#board .category .question
+{
+    cursor: pointer;
+}
+    #board .category.selecting .head,
+    #board .category.selecting .question
+    {
+        background-color: #460099;
+    }
+    #board .category .question.hover
+    {
+        -webkit-box-shadow: 0px 0px 6px 1px rgba(255, 255, 255, 0.8);
+        -moz-box-shadow: 0px 0px 6px 1px rgba(255, 255, 255, 0.8);
+        box-shadow: 0px 0px 6px 1px rgba(255, 255, 255, 0.8);
+    }
+    #board .category .question.step0
+    {
+        -webkit-box-shadow: 0px 0px 1px 1px rgba(255, 255, 255, 1);
+        -moz-box-shadow: 0px 0px 1px 1px rgba(255, 255, 255, 1);
+        box-shadow: 0px 0px 1px 1px rgba(255, 255, 255, 1);
+    }
+    #board .category .question.step1,
+    #board .category .question.step11
+    {
+        -webkit-box-shadow: 0px 0px 2px 1px rgba(255, 255, 255, 1);
+        -moz-box-shadow: 0px 0px 2px 1px rgba(255, 255, 255, 1);
+        box-shadow: 0px 0px 2px 1px rgba(255, 255, 255, 1);
+    }
+    #board .category .question.step2,
+    #board .category .question.step10
+    {
+        -webkit-box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 1);
+        -moz-box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 1);
+        box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 1);
+    }
+    #board .category .question.step3,
+    #board .category .question.step9
+    {
+        -webkit-box-shadow: 0px 0px 6px 1px rgba(255, 255, 255, 1);
+        -moz-box-shadow: 0px 0px 6px 1px rgba(255, 255, 255, 1);
+        box-shadow: 0px 0px 6px 1px rgba(255, 255, 255, 1);
+    }
+    #board .category .question.step4,
+    #board .category .question.step8
+    {
+        -webkit-box-shadow: 0px 0px 8px 1px rgba(255, 255, 255, 1);
+        -moz-box-shadow: 0px 0px 8px 1px rgba(255, 255, 255, 1);
+        box-shadow: 0px 0px 8px 1px rgba(255, 255, 255, 1);
+    }
+    #board .category .question.step5,
+    #board .category .question.step7
+    {
+        -webkit-box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 1);
+        -moz-box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 1);
+        box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 1);
+    }
+    #board .category .question.step6
+    {
+        -webkit-box-shadow: 0px 0px 12px 1px rgba(255, 255, 255, 1);
+        -moz-box-shadow: 0px 0px 12px 1px rgba(255, 255, 255, 1);
+        box-shadow: 0px 0px 12px 1px rgba(255, 255, 255, 1);
+    }
+
+#board .category .question
+{
+    margin-bottom: 0px;
+    margin-top: 8px;
+}
+    #board .category .question.empty
+    {
+        background-color: transparent;
+        cursor: default;
+    }
+        #board .category .question.empty.hover
+        {
+            -webkit-box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+            -moz-box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+            box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.8);
+        }
+#board .category .head .content,
+#board .category .question .points
+{
+    position: static;
+    display: table-cell;
+    width: 120px;
+    height: 86px;
+    padding: 5px;
+    font-size: 22px;
+    text-align: center;
+    vertical-align: middle;
+}
+    @-moz-document url-prefix()
+    {
+        #board .category .question .points
+        {
+            padding-top: 15px;
+        }
+    }
+#board .category .question .qbox
+{
+    position: absolute;
+    width: 130px;
+    height: 96px;
+    background-color: transparent;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 8px;
+    border-radius: 4px;
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+    overflow: hidden;
+}
+#board .category .question .container,
+#board .category .question .qcontainer
+{
+    position: absolute;
+    width: 130px;
+    height: 96px;
+    background-color: #5f00cf;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 8px;
+    border-radius: 4px;
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+    overflow: hidden;
+}
+    #board .category .question .qcontainer
+    {
+        text-shadow: 0px 0px 4px #000000;
+    }
+    @-webkit-keyframes doubles
+    {
+        0%
+        {
+            text-shadow: 0px 0px 1px #000000;
+        }
+        100%
+        {
+            text-shadow: 0px 0px 8px #000000;
+        }
+    }
+    #board .category .question .qcontainer.doubles
+    {
+        -webkit-animation-name: doubles;
+        -webkit-animation-duration: 1.0s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-direction: alternate;
+        -webkit-animation-timing-function: linear;
+
+        text-shadow: 0px 0px 8px #000000;
+        background: -webkit-gradient(linear, 0% 0%, 100% 100%,
+                    from(#5f00cf), to(#7626D6),
+                    color-stop(0.001, #5f00cf),
+                    color-stop(0.048, #5f00cf),
+                    color-stop(0.051, #7626D6),
+                    color-stop(0.098, #7626D6),
+
+                    color-stop(0.101, #5f00cf),
+                    color-stop(0.148, #5f00cf),
+                    color-stop(0.151, #7626D6),
+                    color-stop(0.198, #7626D6),
+
+                    color-stop(0.201, #5f00cf),
+                    color-stop(0.248, #5f00cf),
+                    color-stop(0.251, #7626D6),
+                    color-stop(0.298, #7626D6),
+
+                    color-stop(0.301, #5f00cf),
+                    color-stop(0.348, #5f00cf),
+                    color-stop(0.351, #7626D6),
+                    color-stop(0.398, #7626D6),
+
+                    color-stop(0.401, #5f00cf),
+                    color-stop(0.448, #5f00cf),
+                    color-stop(0.451, #7626D6),
+                    color-stop(0.498, #7626D6),
+
+                    color-stop(0.501, #5f00cf),
+                    color-stop(0.548, #5f00cf),
+                    color-stop(0.551, #7626D6),
+                    color-stop(0.598, #7626D6),
+
+                    color-stop(0.601, #5f00cf),
+                    color-stop(0.648, #5f00cf),
+                    color-stop(0.651, #7626D6),
+                    color-stop(0.698, #7626D6),
+
+                    color-stop(0.701, #5f00cf),
+                    color-stop(0.748, #5f00cf),
+                    color-stop(0.751, #7626D6),
+                    color-stop(0.798, #7626D6),
+
+                    color-stop(0.801, #5f00cf),
+                    color-stop(0.848, #5f00cf),
+                    color-stop(0.851, #7626D6),
+                    color-stop(0.898, #7626D6),
+
+                    color-stop(0.901, #5f00cf),
+                    color-stop(0.948, #5f00cf),
+                    color-stop(0.951, #7626D6),
+                    color-stop(0.998, #7626D6),
+
+                    color-stop(1.000, #7626D6)
+                    );
+        background: -moz-linear-gradient(-45deg,
+                    #5f00cf,
+
+                    #5f00cf 0.1%,
+                    #5f00cf 4.8%,
+                    #7626D6 5.1%,
+                    #7626D6 9.8%,
+
+                    #5f00cf 10.1%,
+                    #5f00cf 14.8%,
+                    #7626D6 15.1%,
+                    #7626D6 19.8%,
+
+                    #5f00cf 20.1%,
+                    #5f00cf 24.8%,
+                    #7626D6 25.1%,
+                    #7626D6 29.8%,
+
+                    #5f00cf 30.1%,
+                    #5f00cf 34.8%,
+                    #7626D6 35.1%,
+                    #7626D6 39.8%,
+
+                    #5f00cf 40.1%,
+                    #5f00cf 44.8%,
+                    #7626D6 45.1%,
+                    #7626D6 49.8%,
+
+                    #5f00cf 50.1%,
+                    #5f00cf 54.8%,
+                    #7626D6 55.1%,
+                    #7626D6 59.8%,
+
+                    #5f00cf 60.1%,
+                    #5f00cf 64.8%,
+                    #7626D6 65.1%,
+                    #7626D6 69.8%,
+
+                    #5f00cf 70.1%,
+                    #5f00cf 74.8%,
+                    #7626D6 75.1%,
+                    #7626D6 79.8%,
+
+                    #5f00cf 80.1%,
+                    #5f00cf 84.8%,
+                    #7626D6 85.1%,
+                    #7626D6 89.8%,
+
+                    #5f00cf 90.1%,
+                    #5f00cf 94.8%,
+                    #7626D6 95.1%,
+                    #7626D6 99.8%,
+
+                    #7626D6 100%
+                    );
+    }
+    #board .category .question .qcontainer.doubles:after
+    {
+        content: 'Daily Double';
+
+        display: block;
+        color: #ffffff;
+        font-size: 36px;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        opacity: 0.5;
+        text-shadow: 0px;
+    }
+    #board .category.selecting .question .container,
+    #board .category.selecting .question .qcontainer
+    {
+        background-color: #460099;
+    }
+    #board .category .question .qcontainer
+    {
+        margin: 5px;
+        width: 120px;
+        height: 86px;
+    }
+    #board .category .question .qbox .container
+    {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    }
+#board .category .question .points
+{
+    font-size: 36px;
+}
+#board .category .question .data
+{
+    position: relative;
+    display: table-cell;
+    width: 130px;
+    height: 96px;
+    font-size: 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+/* fonts */
+/* Droid Sans Mono */
+@font-face
+{
+  font-family: 'Droid Sans Mono';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans Mono'), local('DroidSansMono'), url('/s/fonts/DroidSansMono.ttf') format('truetype');
+}
+/* Droid Sans */
+@font-face
+{
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Sans'), local('DroidSans'), url('/s/fonts/DroidSans.ttf') format('truetype');
+}
+@font-face
+{
+  font-family: 'Droid Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('/s/fonts/DroidSans-Bold.ttf') format('truetype');
+}
+/* Droid Serif */
+@font-face
+{
+  font-family: 'Droid Serif';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Droid Serif Bold'), local('DroidSerif-Bold'), url('/s/fonts/DroidSerif-Bold.ttf') format('truetype');
+}
+@font-face
+{
+  font-family: 'Droid Serif';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Droid Serif'), local('DroidSerif'), url('/s/fonts/DroidSerif.ttf') format('truetype');
+}
+@font-face
+{
+  font-family: 'Droid Serif';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Droid Serif Italic'), local('DroidSerif-Italic'), url('/s/fonts/DroidSerif-Italic.ttf') format('truetype');
+}

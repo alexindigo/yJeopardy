@@ -3,7 +3,7 @@
  * Copyright (c) 2010 Yahoo! Inc. All rights reserved. Copyrights licensed under the MIT License.
  */
 /* Session Model */
-require_once '../models/Session.php';
+require_once HOME.'/models/Session.php';
 
  /**
   * Player Class

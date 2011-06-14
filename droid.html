@@ -1,33 +1,14 @@
-<?php
-/**
- * Copyright (c) 2010 Yahoo! Inc. All rights reserved. Copyrights licensed under the MIT License.
- *
- * User Interface
- *
- * @category Web
- * @package yJeopardy
- * @author Alex Ivashchenko <alexi@yahoo-inc.com>
- * @author Suresh Jayanty <jayantys@yahoo-inc.com>
- * @author St. John Johnson <stjohn@yahoo-inc.com>
- */
-// Provide alternate interface
-if (isset($_GET['alt'])) {
-  header('Location: user.php');
-  exit(1);
-}
-// only iPhone section for now
-?><!doctype html>  
+<!doctype html>  
 <html lang="en">
 <head>
  <title>y!jeopardy</title>
  <meta name="apple-mobile-web-app-capable" content="yes"/>
  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width"/>
  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
- <link type="text/css" href="s/m.css" rel="stylesheet" />
- <script type="text/javascript" src="a/zepto/zepto.js"></script>
- <script type="text/javascript" src="a/zepto/event.js"></script>
- <script type="text/javascript" src="a/zepto/ajax.js"></script>
- <script type="text/javascript" src="a/zepto/detect.js"></script>
+ <link type="text/css" rel="stylesheet" href="s/m.css" />
+ <script type="text/javascript" src="a/raphael.js"></script>
+ <script type="text/javascript" src="a/icons.js"></script>
+ <script type="text/javascript" src="a/zepto-min.js"></script>
  <script type="text/javascript">
 /* <![CDATA[ */
 
@@ -43,11 +24,9 @@ var ORIENT  = '',
 
 $(document).ready(function()
 {
-    // {{{ android hacks
-    if ($.os.android)
-    {
-        $('#loading').find('.sign').text('@');
-    }
+    // {{{ add symbols
+$('#yahoo').html('Y');
+$('#gear').html('*');
     // }}}
 
     // {{{ nice things
@@ -672,13 +651,13 @@ var main = function()
 <div id="page" class="flipped">
 <!-- loading page -->
 <div id="loading" class="card status">
- <span class="sign rotating">&#9881;</span>
+ <span id="gear" class="sign rotating"></span>
 </div>
 <!-- login page -->
 <div id="login" class="card content hidden">
  <h1>Enter your name</h1>
  <input id="login_player" class="text" type="text" name="name" value="" autocorrect="off" placeholder="Name" />
- <span class="sign yahoo">Y!</span>
+ <span id="yahoo" class="sign"></span>
  <div id="login_submit" class="submit">Continue</div>
 </div>
 <!-- inactive -->
@@ -724,7 +703,7 @@ var main = function()
  <h1>How about another round?</h1>
 </div>
 <!-- done -->
-<div id="preloader"><span class="droid">yjeopardy</span><span class="yahoo">yjeopardy</span></div>
+<div id="preloader"><span class="droid">yj</span></div>
 </div>
 </div</body>
 </html>

@@ -3,7 +3,7 @@
  * Copyright (c) 2010 Yahoo! Inc. All rights reserved. Copyrights licensed under the MIT License.
  */
 /* Game Model */
-require_once '../models/Game.php';
+require_once HOME.'/models/Game.php';
 
 /**
  * Json Class

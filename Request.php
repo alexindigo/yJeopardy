@@ -2,10 +2,13 @@
 /**
  * Copyright (c) 2010 Yahoo! Inc. All rights reserved. Copyrights licensed under the MIT License.
  */
+
+define('HOME', $_SERVER['DOCUMENT_ROOT']);
+
 /* Configuration */
-require_once '../Config.php';
+require_once HOME.'/Config.php';
 /* Json Model */
-require_once '../models/Json.php';
+require_once HOME.'/models/Json.php';
 
 /**
  * Request Controller
@@ -41,6 +44,7 @@ class Request extends Json {
     'get_answer',
     'cache_status',
     'cache_clear',
+    'scores_clear',
     'mass_login',
     'pause_game'
   );
@@ -393,7 +397,7 @@ class Request extends Json {
 
   public function get_question() {
     if (!in_array($this->Game->get_game_state(),
-            array(Game::STATE_ANSWER, Game::STATE_DISPLAY_QUESTION))) {
+            array(Game::STATE_ANSWER, Game::STATE_BUZZ_IN, Game::STATE_DISPLAY_QUESTION))) {
       throw new Exception('Not in Display Question Game State');
     }
 
@@ -455,6 +459,25 @@ class Request extends Json {
 
     // Set active player
     $this->Game->set_active_player($this->Game->get_last_winner());
+
+    // Move to pick question
+    $this->Game->set_game_state(Game::STATE_PICK_QUESTION);
+  }
+  
+  public function scores_clear() {
+    $this->_auth_admin();
+
+    // Reset scores
+    $players = Player::get_players();
+    foreach ($players as $player) {
+      $player->set_points(0);
+    }
+    
+    // Reload gameboard
+    $this->Game->GameBoard->start_round();
+
+    // Set active player
+    $this->Game->set_active_player($this->Game->get_last_winner(true));
 
     // Move to pick question
     $this->Game->set_game_state(Game::STATE_PICK_QUESTION);

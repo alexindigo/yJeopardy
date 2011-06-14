@@ -5,6 +5,6 @@ define('ADMIN_PASSWORD', 'toor');
 
 define('ADMIN_SECRET', 'yJk6sd.aq5BlE');
 
-define('NUM_ROUNDS', 3);
+define('NUM_ROUNDS', 1);
 
 ?>

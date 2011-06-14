@@ -3,11 +3,11 @@
  * Copyright (c) 2010 Yahoo! Inc. All rights reserved. Copyrights licensed under the MIT License.
  */
 /* Configuration */
-require_once '../Config.php';
+require_once HOME.'/Config.php';
 /* Player Model */
-require_once 'Player.php';
+require_once HOME.'/models/Player.php';
 /* GameBoard Model */
-require_once 'GameBoard.php';
+require_once HOME.'/models/GameBoard.php';
 
  /**
   * Game Class

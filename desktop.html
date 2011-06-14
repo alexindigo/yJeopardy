@@ -3,7 +3,7 @@
 <head>
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <title>y!jeopardy</title>
- <link type="text/css" href="s/main.css" rel="stylesheet" media="screen, projection" />
+ <link type="text/css" href="s/desktop.css" rel="stylesheet" media="screen, projection" />
  <script type="text/javascript" src="a/prototype.js"></script>
  <script type="text/javascript" src="a/scriptaculous/scriptaculous.js"></script>
  <script type="text/javascript" src="a/livepipe/livepipe.js"></script>
@@ -30,10 +30,12 @@ var questioning,
     blinkingPE,
     lastShowing,
 
-    STATE = 'INIT',
-    PLAYER = '',
-    SCROLL = null,
-    TIME = null,
+    CANBUZZ         = false,
+    STATE           = 'INIT',
+    PLAYER          = '',
+    LOGGED          = false,
+    SCROLL          = null,
+    TIME            = null,
     questioningStep = 0;
 
 Event.observe(document, 'dom:loaded', function()
@@ -45,119 +47,51 @@ Event.observe(document, 'dom:loaded', function()
         if (++questioningStep > 11) questioningStep = 0;
     }
 
-    choosing = function()
-    {
-        if (!choosingCategory)
-        {
-            choosingCategory = $$('#board .category').last();
-        }
-
-        choosingCategory.removeClassName('selecting');
-
-        if (!(choosingCategory = choosingCategory.next()))
-        {
-            choosingCategory = $$('#board .category').first();
-        }
-
-        choosingCategory.addClassName('selecting');
-    }
-
-    blinking = function(rate)
-    {
-        new Effect.Opacity($('timer'), {from: 1.0, to: 0.0, transition: Effect.Transitions.linear, duration: rate});
-        new Effect.Opacity($('timer'), {from: 0.0, to: 1.0, transition: Effect.Transitions.linear, duration: rate, delay: rate});
-    }
-
-    timer = function()
-    {
-        jstProcess(new JsEvalContext({time: TIME, dots: timerDots}), $('timer'));
-
-        switch (TIME)
-        {
-            case 20:
-            case 10:
-            case 4:
-            case 3:
-            case 2:
-            case 1:
-            case 0:
-                blinking(0.15);
-                break;
-        }
-
-        if (!TIME && timerPE)
-        {
-            blinking.delay(0.2, 0.1);
-            blinking.delay(0.4, 0.1);
-            blinking.delay(0.6, 0.1);
-            $('timer').fade({duration: 0.25, delay: 0.8});
-            timerPE.stop();
-        }
-        if (TIME) TIME--;
-    }
-    timer();
-
-    stopTimer = function()
-    {
-        if (timerPE) timerPE.stop();
-        $('timer').fade(
-        {
-            duration: 0.3,
-            afterFinish: function()
-            {
-                TIME = null;
-                timer();
-            }
-        });
-    }
-
-    updateTimer = function(left)
-    {
-        TIME = left;
-        timerDots = $R(1, TIME).toArray();
-
-        $('timer').hide().appear(0.3);
-
-        timerPE = new PeriodicalExecuter(timer, 1);
-        timer();
-    }
-
     updateStatus = function(message)
     {
-        $('status').update(message);
+//        $('status').update(message);
     }
 
     // add eye-candies
-/*
     $('main').on('mouseover', YJ.Tools.hoverableOver.bind($('main')));
     $('main').on('mouseout', YJ.Tools.hoverableOut.bind($('main')));
-*/
 
-    // {{{ Live updating
-    // players list
-    YJ.Tools.liveUpdate('get_players', 0.5, function(response)
+    $('board').on('click', 'div.question', function(e, el)
     {
-        var active;
+        if (el.hasClassName('empty')) return false;
 
-        if (response.responseJSON.status == 'ok')
+        YJ.Tools.request('pick_question', {id: el.id.replace('question_', '')}, function(response)
         {
-            // update players
-            jstProcess(new JsEvalContext(response.responseJSON.data), $('players'));
-
-            if ((active = $$('#players li.active').first()) && (PLAYER != active))
+            if (response.responseJSON.status != 'ok')
             {
-                if (!SCROLL)
-                {
-                    SCROLL = new Control.ScrollBar('players', 'dummy');
-                }
-
-                PLAYER = active;
-                SCROLL.recalculateLayout();
-                SCROLL.scrollTo(PLAYER, true);
+                alert(response.responseJSON.data);
             }
-        }
+        });
     });
 
+    // buzzer handler
+    // buzz!
+    $('buzz_submit').observe('click', function(el)
+    {
+        if (!$('buzz_submit').hasClassName('enabled')) return false;
+
+        YJ.Tools.request('buzz', {}, function(response)
+        {
+            if (response.responseJSON.status = 'ok')
+            {
+                if (!response.responseJSON.data.buzzed)
+                    alert('Somebody buzzed first');
+            }
+            else
+            {
+                alert(response.responseJSON.data);
+            }
+        });
+
+        $('buzz_submit').removeClassName('enabled');
+    }).hide().removeClassName('hidden');
+
+    // {{{ Live updating
     // get categories
     YJ.Tools.liveUpdate('get_categories', 1, function(response)
     {
@@ -168,15 +102,15 @@ Event.observe(document, 'dom:loaded', function()
         }
     });
 
-    // process states
-    YJ.Tools.liveUpdate('get_game_state', 0.5, function(response)
+    // get player + state
+    YJ.Tools.liveUpdate('get_player', 0.5, function(response)
     {
         if (response.responseJSON.status == 'ok')
         {
-            if (STATE != response.responseJSON.data.game_state)
+            if (STATE != response.responseJSON.data.state)
             {
                 var oldState = STATE;
-                STATE = response.responseJSON.data.game_state;
+                STATE = response.responseJSON.data.state;
 
                 // run teardown if so
                 if (oldState in YJ.States && Object.isFunction(YJ.States[oldState].stop)) YJ.States[oldState].stop(STATE);
@@ -184,9 +118,70 @@ Event.observe(document, 'dom:loaded', function()
                 // run init if so
                 if (STATE in YJ.States && Object.isFunction(YJ.States[STATE].start)) YJ.States[STATE].start(oldState);
             }
+
+            if (['PICK_QUESTION'].include(STATE))
+            {
+                if (!response.responseJSON.data.active)
+                {
+                    $('screen').addClassName('paused').down('div').update('Wait for your turn');
+                }
+                else
+                {
+                    $('screen').removeClassName('paused').down('div').update();
+                }
+            }
+
+            if (['ANSWER'].include(STATE))
+            {
+                if (response.responseJSON.data.active)
+                {
+                    $('screen').addClassName('paused').down('div').update('Now you can answer');
+                }
+                else
+                {
+                    $('screen').addClassName('paused').down('div').update('Wait for your turn');
+                }
+            }
+
+            if (!LOGGED)
+            {
+                LOGGED = response.responseJSON.data;
+                if ($('screen').hasClassName('signin'))
+                {
+                    $('screen').removeClassName('signin').down('div').update();
+                    $('screen').removeClassName('active');
+                }
+            }
+
+            // update board
+            jstProcess(new JsEvalContext(response.responseJSON.data), $('badge'));
+        }
+        else
+        {
+            LOGGED = false;
+            if ($('screen').hasClassName('signin')) return;
+
+            $('screen').down('div').update('Enter your name');
+            $('screen').addClassName('signin').down('div').insert('<input id="player_signin" type="text" name="player" value="" />');
+            $('screen').addClassName('active');
+
+            $('player_signin').observe('keyup', function(e)
+            {
+                if (e.keyCode == Event.KEY_RETURN)
+                {
+                    YJ.Tools.request('new_player', {name: $F('player_signin')}, function(response)
+                    {
+                        if (response.responseJSON.status != 'ok')
+                        {
+                            alert(response.responseJSON.data);
+                            $('player_signin').clear().focus();
+                        }
+                    });
+                    $('player_signin').blur();
+                }
+            }).focus();
         }
     });
-
 
     // }}}
 
@@ -215,15 +210,10 @@ YJ.States =
         {
             $$('#board .qcontainer').invoke('fade', 0.5);
             $$('#board .qcontainer').invoke('remove');
-            choosingPE = new PeriodicalExecuter(choosing, 0.8);
-            updateStatus('Please pick your question');
         },
 
         stop: function()
         {
-            choosingCategory.removeClassName('selecting');
-            if (choosingPE) choosingPE.stop();
-            updateStatus();
         }
     },
 
@@ -238,12 +228,52 @@ YJ.States =
                     YJ.Tools.showQuestion(response.responseJSON.data);
                 }
             });
-            updateStatus();
+
+            $('screen').removeClassName('paused').down('div').update();
         },
 
         stop: function()
         {
-            updateStatus();
+        }
+    },
+
+
+    _BUZZING: function()
+    {
+        if (CANBUZZ)
+        {
+            $('buzz_submit').addClassName('enabled');
+        }
+        else
+        {
+            $('buzz_submit').removeClassName('enabled');
+
+            // add waiting for the buzz
+            YJ.Tools.request('wait_buzz', function(response)
+            {
+                if (response.responseJSON.status == 'ok')
+                {
+                    if (response.responseJSON.data.can_buzz)
+                    {
+                        CANBUZZ = true;
+                        if (STATE != 'BUZZ_IN')
+                            YJ.States['BUZZ_IN'].start();
+                        else
+                            YJ.States._BUZZING();
+                    }
+                    else
+                    {
+                        CANBUZZ = false;
+                        // try again
+                        if (['BUZZ_IN', 'ANSWER', 'DISPLAY_QUESTION'].include(STATE))
+                            YJ.States._BUZZING();
+                    }
+                }
+                else
+                {
+                    alert(response.responseJSON.data);
+                }
+            });
         }
     },
 
@@ -260,22 +290,21 @@ YJ.States =
                     if (response.responseJSON.status == 'ok')
                     {
                         YJ.Tools.showQuestion(response.responseJSON.data);
-                        updateTimer(30);
                     }
                 });
             }
-            else
-            {
-                updateTimer(30);
-            }
 
-            updateStatus('You can buzz whenever you ready');
+            // show button
+            $('screen').addClassName('covered').down('div').update();
+            $('buzz_submit').appear();
+            YJ.States._BUZZING();
         },
 
         stop: function()
         {
-            updateStatus();
-            stopTimer();
+            CANBUZZ = false;
+            $('screen').removeClassName('covered').down('div').update();
+            $('buzz_submit').fade();
         }
     },
 
@@ -295,13 +324,11 @@ YJ.States =
                     }
                 });
             }
-
-            updateStatus('Waiting for the answer');
         },
 
         stop: function()
         {
-            updateStatus();
+            $('screen').removeClassName('paused').down('div').update();
         }
     },
 
@@ -466,13 +493,26 @@ YJ.Tools =
 
     request: function(method, callback)
     {
+        var parameters;
+
+        // wierd thing, but I want to support old format,
+        // and I want to have meaning arguments order for new format
+        // and I don't want to have two functions
+        if (arguments.length > 2)
+        {
+            parameters  = arguments[1];
+            callback    = arguments[2];
+        }
+
+        parameters = Object.extend(
+        {
+            method: method
+        }, parameters || {});
+
         options = Object.deepExtend(
         {
             method: 'get',
-            parameters:
-            {
-                method: method
-            },
+            parameters: parameters,
             onSuccess: Object.isFunction(callback) ? callback : Prototype.emptyFunction
         }, (Object.isFunction(callback) ? {} : callback) || {});
 
@@ -584,19 +624,10 @@ Object.deepExtend = function(destination, source) {
 <body>
 
 <div id="main">
-    <ul id="timer" jsvalues="$time:$this.time;$dots:$this.dots">
-     <li jsselect="$this.dots" jsdisplay="$dots" jsvalues=".className:($time > $index) ? 'fill' : 'empty'"></li>
-    </ul>
-    <ul id="players">
-     <li class="empty"></li>
-     <li jsselect="$this" jsvalues=".id:'player_'+$this.handle;.className:($this.active)? 'player active' : 'player'" class="player">
+    <div id="badge" jseval="($this.active)?this.addClassName('active'):this.removeClassName('active');">
       <span jscontent="$this.name" class="name"></span>
-      <span jscontent="$this.points" class="score"></span>
-      <span jsdisplay="$this.active" class="buzz">&#9728;</span>
-     </li>
-     <li class="empty"></li>
-    </ul>
-    <div id="shade"></div>
+      <span jscontent="$this.score" class="score"></span>
+    </div>
 
     <div id="board">
      <div jsselect="$this" jsvalues=".id:$this.id" class="category">
@@ -604,7 +635,7 @@ Object.deepExtend = function(destination, source) {
        <div jscontent="$this.name" class="content"></div>
       </div>
 
-      <div jsselect="$this.questions" jsvalues=".id:'question_'+$this.id" class="question">
+      <div jsselect="$this.questions" jsvalues=".id:'question_'+$this.id" jseval="($this.played)?this.addClassName('empty'):this.removeClassName('empty');" class="question">
        <div jsdisplay="!$this.played" class="qbox">
         <div class="container">
          <div jscontent="$this.points" class="points"></div>
@@ -612,12 +643,11 @@ Object.deepExtend = function(destination, source) {
        </div>
       </div>
      </div>
-     
-    </div>
 
-    <div id="status"></div>
+    </div>
 </div>
 <div id="screen"><div></div></div>
 <div id="dummy"><div></div></div>
+<div id="buzz_submit" class="submit hidden">Buzz</div>
 </body>
 </html>
