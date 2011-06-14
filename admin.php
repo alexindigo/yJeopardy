@@ -10,9 +10,11 @@ include 'login.php';
     <script type="text/javascript" src="a/prototype.js"></script>
     <script type="text/javascript" src="a/scriptaculous/scriptaculous.js"></script>
     <script type="text/javascript">
-      var admin = {
+      var admin =
+      {
         update_game_state: function() {
-          new Ajax.Request('Request.php?method=get_game_state&r=' + Math.random(), {
+          new Ajax.Request('Request.php?method=get_game_state&r=' + Math.random(),
+          {
             onSuccess: function(transport) {
               if (transport.responseJSON.status == 'ok') {
                 if (admin.timer == 0) {
@@ -29,9 +31,11 @@ include 'login.php';
                 if (state != admin.game_state || player != admin.active_player) {
                   // update dom
                   if (player != '') {
-                    $('game_state').update(state + ' - ' + player);
+                    $('game_state').update(state);
+                    $('game_data').update(player);
                   } else {
                     $('game_state').update(state);
+                    $('game_data').update('');
                   }
                 }
 
@@ -88,7 +92,7 @@ include 'login.php';
             }
           });
         },
-        ajax_call: function(method) {
+        ajax_call: function(method, params, callback) {
           if (this.ajax == false) {
             // prevent multiple calls
             this.ajax = true;
@@ -100,14 +104,29 @@ include 'login.php';
             $('loader').show();
             new Effect.Opacity('loader', { from: 0.0, to: 0.75, duration: 0.1 });
 
-            new Ajax.Request('Request.php?wssid=<?php echo ADMIN_SECRET; ?>&method=' + method + '&r=' + Math.random(), {
-              onSuccess: function(transport) {
+            params = Object.extend(params || {},
+            {
+                wssid:  '<?php echo ADMIN_SECRET; ?>',
+                method: method,
+                r:      Math.random()
+            });
+
+            new Ajax.Request('Request.php',
+            {
+              parameters: params,
+              onSuccess: function(transport)
+              {
                 admin.ajax = false;
                 $('loader').hide();
                 new Effect.Opacity('loader', { from: 0.75, to: 0.0, duration: 0.1 });
 
                 if (transport.responseJSON.status == 'ok') {
-                  admin.update_game_state();
+                  // if no callback assume it's regular call and something happened on the server
+                  if (!callback) {
+                    admin.update_game_state();
+                  } else { // but if there is one let them decide what to do
+                    callback(transport.responseJSON.data);
+                  }
                 } else {
                   alert('Error: ' + transport.responseJSON.data);
                 }
@@ -121,8 +140,11 @@ include 'login.php';
         start_game: function() {
           this.ajax_call('start_round');
         },
-        reset_game: function() {
+        reset_score: function() {
           this.ajax_call('scores_clear');
+        },
+        reset_game: function() {
+          this.ajax_call('reset_game');
         },
         start_round: function() {
           this.ajax_call('next_round');
@@ -143,6 +165,54 @@ include 'login.php';
         answer_wrong: function() {
           this.ajax_call('answer_wrong');
         },
+        update_players_list: function(data)
+        {
+            var container = $('remove_players').update();
+
+            data.each(function(pl)
+            {
+                container.insert('<span id="player_'+pl.id+'" class="player">'+pl.name+'</span>');
+            });
+        },
+        show_remove_players: function()
+        {
+          // show display
+          this.ajax_call('show_remove_players', {}, function(data)
+          {
+            this.update_players_list(data);
+
+            // some dirty magic here – it's 5am and stuff
+            $('action_button').insert({after: '<span id="action_back" class="button" onclick="admin.done_remove_players()">Done</span>'}).hide();
+
+            this.rm_handle = $('remove_players').on('click', 'span.player', function(e, el)
+            {
+                var id = el.id.substr(7);
+                if (id) this.remove_player(id);
+            }.bind(this));
+
+            // show off
+            $('paused').hide();
+            $('remove_players').show();
+          }.bind(this));
+        },
+        remove_player: function(id)
+        {
+          this.ajax_call('remove_player', {id: id}, function(data)
+          {
+            this.update_players_list(data);
+          }.bind(this));
+        },
+        done_remove_players: function()
+        {
+            if (this.rm_handle) this.rm_handle.stop();
+
+            if ($('action_back')) $('action_back').remove();
+            $('action_button').show();
+
+            $('paused').show();
+            $('remove_players').hide().update();
+        },
+
         game_state: '',
         active_player: '',
         timer: 0,
@@ -159,26 +229,43 @@ include 'login.php';
   <body onload="setInterval(function() { window.scrollTo(0, 1) }, 1000);">
     <div class="container">
       <div class="menu">
-        <div style="float:left">
-        Y! Jeopardy
+        <div id="game_state" style="float:left">
+         Loading...
         </div>
-        <span class="button" onclick="admin.pause_game()">
+        <span id="action_button" class="button" onclick="admin.pause_game()">
           Pause
         </span>
       </div>
       <div class="content">
         <br />
-        <h2 id="game_state">Loading...</h2>
+        <h2 id="game_data"></h2>
         <br />
         <div id="paused" class="panel" style="display: none">
           <div class="button" onclick="admin.pause_game()">
             Resume Game
           </div>
-
-          <div class="button" onclick="admin.reset_game()">
+          <br />
+          <br />
+          <br />
+          <div class="button" onclick="admin.reset_score()">
+            Reset Score
+          </div>
+          <br />
+          <div class="button" onclick="admin.show_remove_players()">
+            Remove Players
+          </div>
+          <br />
+          <br />
+          <br />
+          <div class="button danger" onclick="admin.reset_game()">
             Reset Game
           </div>
         </div>
+
+        <div id="remove_players" class="panel" style="display: none">
+        </div>
+
+
         <div id="game_over" class="panel" style="display: none">
           <div class="button" onclick="admin.start_game()">
             Start Game

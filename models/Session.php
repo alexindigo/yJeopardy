@@ -10,20 +10,35 @@
  * @author St. John Johnson <stjohn@yahoo-inc.com>
  */
 
-class Session {
+class Session
+{
+  public static function purge_id($id)
+  {
+      apc_delete('handle_' . $id);
+  }
+
   public static function get_id($override = false) {
     $id = '';
-    if (!$override) {
-      if (isset($_COOKIE['si'])) {
+    if (!$override)
+    {
+      if (isset($_COOKIE['si']))
+      {
         $id = $_COOKIE['si'];
-      } else {
+      }
+      else
+      {
         $cookies = array();
-        if (function_exists('apache_request_headers')) {
+        if (function_exists('apache_request_headers'))
+        {
           $headers = apache_request_headers();
-        } else {
+        }
+        else
+        {
           $headers = array();
-          foreach($_SERVER as $key => $value) {
-            if (substr($key,0,5) == "HTTP_") {
+          foreach($_SERVER as $key => $value)
+          {
+            if (substr($key,0,5) == "HTTP_")
+            {
               $key = str_replace(" ","-",ucwords(strtolower(str_replace("_"," ",substr($key,5)))));
               $headers[$key] = $value;
             }
@@ -31,21 +46,26 @@ class Session {
         }
 
         $headers = explode(';', $headers['Cookie']);
-        foreach ($headers as $header) {
+        foreach ($headers as $header)
+        {
           list($key, $value) = explode('=', trim($header));
           $cookies[$key] = $value;
         }
 
-        if (isset($cookies['si'])) {
+        if (isset($cookies['si']))
+        {
           $id = $cookies['si'];
         }
       }
     }
 
-    if ($id == '') {
-      do {
+    if ($id == '')
+    {
+      do
+      {
         $id = substr(md5(microtime(true)), 0, 7);
-      } while (apc_fetch('handle_' . $id) !== false);
+      }
+      while (apc_fetch('handle_' . $id) !== false);
 
       apc_store('handle_' . $id, true);
       $_COOKIE['si'] = $id;

@@ -106,6 +106,31 @@ class Player {
     }
   }
 
+    /**
+     * Remove player from the cache
+     */
+    public function remove()
+    {
+        // Clear points
+        apc_delete('points_' . $this->id);
+
+        for (;;)
+        {
+            // Remove player from list
+            $players = self::get_player_list();
+
+            if (isset($players[$this->id])) unset($players[$this->id]);
+
+            apc_store('player_list', $players);
+
+            // Ensure player was removed correctly
+            $players = self::get_player_list();
+            if (!isset($players[$this->id])) {
+                break;
+            }
+        }
+    }
+
   /**
    * Returns number of Points that the Player has
    * @return int

@@ -31,6 +31,9 @@ $(document).ready(function()
     Raphael($('#gear').get(0), 100, 100).
         path(icons.gear.p).
         attr({fill: "#c0c0c0", stroke: "#ffffff", 'stroke-opacity': 0.35, 'stroke-width': 2, scale: "2, 2, 0, 0", translation: "18, 18"});
+    Raphael($('#pause_gear').get(0), 100, 100).
+        path(icons.gear.p).
+        attr({fill: "#c0c0c0", stroke: "#ffffff", 'stroke-opacity': 0.35, 'stroke-width': 2, scale: "2, 2, 0, 0", translation: "18, 18"});
     // }}}
 
     // {{{ nice things
@@ -697,7 +700,7 @@ var main = function()
 <!-- pause -->
 <div id="pause" class="card status hidden">
  <h1>Pause</h1>
- <span class="sign rotating">&#9881;</span>
+ <span id="pause_gear" class="sign rotating"></span>
 </div>
 <!-- game_over -->
 <div id="game_over" class="card status error hidden">

@@ -45,13 +45,16 @@ class Request extends Json {
     'cache_status',
     'cache_clear',
     'scores_clear',
+    'reset_game',
     'mass_login',
-    'pause_game'
+    'pause_game',
+    'show_remove_players',
+    'remove_player'
   );
 
   /**
    * Looks for a logged in user.
-   * 
+   *
    * @return Player object
    */
   private function _auth_player() {
@@ -64,11 +67,11 @@ class Request extends Json {
 
   /**
    * Checks for admin authorization code
-   * 
+   *
    * @throws Exception if invalid code sent
    */
   private function _auth_admin() {
-    if (!isset($_REQUEST['wssid']) || 
+    if (!isset($_REQUEST['wssid']) ||
         $_REQUEST['wssid'] != ADMIN_SECRET) {
       throw new Exception('Player is not Admin');
     }
@@ -76,7 +79,7 @@ class Request extends Json {
 
   /**
    * Gets the current logged in Player's information
-   * 
+   *
    * @return array Player handle, points, state
    */
   public function get_player() {
@@ -102,7 +105,7 @@ class Request extends Json {
 
   /**
    * Creates a new player to the game
-   * 
+   *
    * @param Array $data Player name
    * @return Array Player handle, points, state
    */
@@ -269,11 +272,20 @@ class Request extends Json {
                    'name' => $player->name);
   }
 
-  public function get_game_state() {
+  public function get_game_state()
+  {
+/*
+    if (Session::get_id())
+    {
+        
+    }
+*/
+
     $output = array('game_state' => $this->Game->get_game_state());
     try {
       $output = array_merge($output, $this->get_active_player());
-    } catch (Exception $e) {}
+    }
+    catch (Exception $e) {}
     return $output;
   }
 
@@ -318,10 +330,10 @@ class Request extends Json {
 
     return $final;
   }
-  
+
   public function get_categories() {
     $questions = $this->Game->GameBoard->get();
-    
+
     $cat_map = array();
     $categories = array();
     foreach ($questions as $id => $question) {
@@ -410,19 +422,19 @@ class Request extends Json {
            'question' => $question['question']
     );
   }
-  
+
   public function pause_game() {
     $this->_auth_admin();
-    
+
     $this->Game->set_game_state(Game::STATE_PAUSED);
     $state = apc_fetch('game_paused') ? true : false;
-    
+
     return array('paused' => $state);
   }
-  
+
   public function start_round() {
     $this->_auth_admin();
-    
+
     if ($this->Game->get_game_state() != Game::STATE_GAME_OVER) {
       throw new Exception('Game not in Game Over state');
     }
@@ -463,8 +475,24 @@ class Request extends Json {
     // Move to pick question
     $this->Game->set_game_state(Game::STATE_PICK_QUESTION);
   }
-  
+
   public function scores_clear() {
+    $this->_auth_admin();
+
+    // Reset scores
+    $players = Player::get_players();
+    foreach ($players as $player) {
+      $player->set_points(0);
+    }
+
+    // Set active player
+    $this->Game->set_active_player($this->Game->get_last_winner(true));
+
+    // Move to pick question
+    $this->Game->set_game_state(Game::STATE_PICK_QUESTION);
+  }
+
+  public function reset_game() {
     $this->_auth_admin();
 
     // Reset scores
@@ -487,6 +515,40 @@ class Request extends Json {
    *
    * @admin
    */
+
+  public function show_remove_players()
+  {
+    $this->_auth_admin();
+
+    // get players
+    $players = Player::get_players();
+
+    return array_values($players);
+  }
+
+  public function remove_player($data)
+  {
+    $this->_auth_admin();
+
+    // Reset scores
+    $player = new Player($data['id']);
+
+    if (!$player)
+    {
+      throw new Exception('Unable to find player with id ['.$id.']');
+    }
+
+    $player->remove();
+
+    Session::purge_id($data['id']);
+
+    // get rest of the players
+    $players = Player::get_players();
+    return array_values($players);
+  }
+
+
+
   public function new_active_player() {
     $this->_auth_admin();
 
@@ -509,10 +571,10 @@ class Request extends Json {
     // Update State
     $this->Game->set_game_state(Game::STATE_PICK_QUESTION);
   }
-  
+
   public function get_answer() {
     $this->_auth_admin();
-    
+
     if (!in_array($this->Game->get_game_state(),
         array(Game::STATE_DISPLAY_QUESTION, Game::STATE_PICK_QUESTION, Game::STATE_BUZZ_IN, Game::STATE_ANSWER))) {
       throw new Exception('Game not in a valid state to get answer');
@@ -523,7 +585,7 @@ class Request extends Json {
 
     // Get Question Points
     $question = $this->Game->GameBoard->get_question($qid);
-    
+
     return array('id' => $qid,
              'answer' => $question['answer']);
   }
