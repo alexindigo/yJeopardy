@@ -26,8 +26,8 @@ Except as specifically stated below, the 3rd party software packages are not dis
 this project, but instead are separately downloaded from the respective provider and built on the
 developer’s machine as a pre-build step.
 
-Downloaded javascript libraries should be placed under htdocs/a folder in respectful directories,
-except prototype.js which should placed directly into htdocs/a folder.
+Downloaded javascript libraries should be placed under 'a' folder in respectful directories,
+except prototype.js which should placed directly into 'a' folder.
 
 * prototype version 1.7 (MIT license)
 (Prototype is a JavaScript Framework that aims to ease development of dynamic web applications.)
@@ -49,7 +49,7 @@ except prototype.js which should placed directly into htdocs/a folder.
 (Simple and robust browser side template processing for Ajax based web applications.)
 [http://code.google.com/p/google-jstemplate/]
 
-Downloaded font files should placed under public_html/s/fonts folder.
+Downloaded font files should be placed under 's/fonts' folder.
 
 -----------------------
 * Droid Sans font family (Apache License 2.0)
@@ -59,18 +59,14 @@ Downloaded font files should placed under public_html/s/fonts folder.
 
 
                             ** Installation **
-The installation is relatively simple on most machines (except Yahoo boxes).
+The installation is relatively simple on most machines.
 
 Requirements:
- - Some sort of HTTP server (apache preferred)
- - PHP 5..something
- - PHP Json (yphp_json)
- - PHP APC (yphp_apc)
-
-It's best to point your root URL at public_html/
- - Example: http://yjeopardy.yahoo.com/ => public_html/
-Otherwise, there might be some minor errors with CSS/JS absolute path junk
-
+ - Some sort of HTTP server (has been tested on apache, nginx)
+ - PHP 5..something  (has been tested on 5.3)
+ - PHP APC
+ - PHP JSON
+ - PHP Sessions
 
 
                             ** Configuration **
@@ -82,7 +78,7 @@ Configuration is done in the Config.php file
  - NUM_ROUNDS is.. well the number of rounds in the game
 
 Questions are stored in questions/ (duh) and should be in the format:
- - round-{ROUND NUMBER}.yaml
+ - round-{ROUND NUMBER}.php
 
 The contents of these files are stored in a relatively confusing format (jk):
 
@@ -102,16 +98,16 @@ If you don't provide a Daily Double, one will automagically be picked.
                              ** Gameplay **
 Note: The CSS/JS actions in this game were designed for use in a WebKit browser.
       It will work in other browsers (kinda), but won't look as pretty.  So try
-      to use Chrome (woohoo) or Safari (yuck).
+      to use Chrome or Safari.
 
-The main screen can be accessed via /main.html
+The main screen can be accessed via /?main
   It was designed to look the prettiest in full screen mode
   Also, there are no sounds - future feature, I swear
 
-The admin panel can be accessed via /admin.php (username/password set in config)
+The admin panel can be accessed via /?admin (username/password set in config)
   This was made for a hand-held device (iPhone or Droid)
 
-The user interface can be accessed via /index.php or alternate UI /index.php?alt
+The user interface can be accessed via / or alternate UI /?simple
   This was also made for a hand-held device (iPhone or Droid)
 
 For testing, you can also use /text.php (username/password set in config)

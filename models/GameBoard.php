@@ -52,7 +52,7 @@ class GameBoard {
     if (!is_numeric($id)) {
       throw new Exception('Invalid Round Number');
     }
-    $lines = file_get_contents(HOME.'/questions/round-' . $id . '.yaml');
+    $lines = file_get_contents(HOME.'/questions/round-' . $id . '.php');
     $lines = explode("\n", $lines);
     $board = array();
 

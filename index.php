@@ -31,12 +31,10 @@ switch (TRUE)
         include 'simple.html';
         exit;
     case isset($_GET['main']):
-        include 'login.php';
         include 'main.html';
         exit;
     case isset($_GET['admin']):
-        include 'login.php';
-        include 'admin.html';
+        include 'admin.php';
         exit;
 
     // switch user agents

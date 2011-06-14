@@ -1,4 +1,5 @@
-Category 1 - Round 3:
+#<?php exit();?>
+Category 1 - Round 2:
   50:
   - Question 1
   - Answer1

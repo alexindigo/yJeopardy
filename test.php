@@ -3,7 +3,9 @@
  * Copyright (c) 2010 Yahoo! Inc. All rights reserved. Copyrights licensed under the MIT License.
  */
 /* Configuration */
-require_once $_SERVER['DOCUMENT_ROOT'].'/models/Config.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Config.php';
+
+include 'login.php';
 
 /**
  * AJAX Call Test Environment

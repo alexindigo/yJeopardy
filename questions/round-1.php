@@ -1,3 +1,4 @@
+#<?php exit();?>
 Famous Women in History:
   50:
   - First female Secretary of State in 1997
