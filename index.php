@@ -31,7 +31,7 @@ switch (TRUE)
         include 'simple.html';
         exit;
     case isset($_GET['main']):
-        include 'main.html';
+        include 'main.php';
         exit;
     case isset($_GET['admin']):
         include 'admin.php';
