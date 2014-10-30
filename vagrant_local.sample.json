@@ -1,0 +1,26 @@
+{
+  "ip": "192.168.80.81",
+  "forwarded_port":
+  {
+    "80": "8085"
+  },
+  "synced_folder":
+  {
+    ".": "/project"
+  },
+  "provision":
+  {
+    "file":
+    {
+      "~/.gitconfig": "/home/vagrant/.gitconfig"
+    },
+    "shell":
+    {
+      "./test.sh":
+      [
+        "arg_1",
+        "arg_2"
+      ]
+    }
+  }
+}
